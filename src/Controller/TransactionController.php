@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Dto\CreateTransactionDto;
 use App\Entity\User;
+use App\Rules\UserExistRule;
+use App\Services\BusinessValidation\BusinessValidationService;
 use App\Services\TransactionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,14 +25,25 @@ class TransactionController extends AbstractController
     private $entityManager;
 
     /**
+     * @var BusinessValidationService
+     */
+    private $businessValidationService;
+
+    /**
      * TransactionController constructor.
      * @param TransactionService $service
      * @param EntityManagerInterface $entityManager
+     * @param BusinessValidationService $businessValidationService
      */
-    public function __construct(TransactionService $service, EntityManagerInterface $entityManager)
+    public function __construct(
+        TransactionService $service,
+        EntityManagerInterface $entityManager,
+        BusinessValidationService $businessValidationService
+    )
     {
         $this->service = $service;
         $this->entityManager = $entityManager;
+        $this->businessValidationService = $businessValidationService;
     }
 
     /**
@@ -44,6 +57,11 @@ class TransactionController extends AbstractController
 
         $fromUser = $userRepository->findOneBy(['email' => $createTransactionDto->getFromUser()]);
         $toUser = $userRepository->findOneBy(['email' => $createTransactionDto->getToUser()]);
+
+        $this->businessValidationService->validate([
+            new UserExistRule($fromUser, $createTransactionDto->getFromUser()),
+            new UserExistRule($toUser, $createTransactionDto->getToUser()),
+        ]);
 
         $transaction = $this->service->create($fromUser, $toUser, $createTransactionDto->getAmount());
 

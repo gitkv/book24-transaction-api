@@ -4,6 +4,7 @@
 namespace App\Listener;
 
 
+use App\Exceptions\BusinessRuleValidationException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -27,12 +28,23 @@ class ValidationExceptionListener implements EventSubscriberInterface
     public function onException(ExceptionEvent $event)
     {
         $throwable = $event->getThrowable();
-        if (!$throwable instanceof ValidatorException && !$throwable instanceof NotNormalizableValueException) {
+
+        if (
+            !$throwable instanceof ValidatorException
+            && !$throwable instanceof NotNormalizableValueException
+            && !$throwable instanceof BusinessRuleValidationException
+        ) {
             return;
         }
 
         $errors = [];
-        $errors[] = $throwable->getMessage();
+        if ($throwable instanceof BusinessRuleValidationException) {
+            $errors = $throwable->getErrors();
+        }
+        else {
+
+            $errors[] = $throwable->getMessage();
+        }
 
         /** @var ConstraintViolationInterface $violation */
         /*foreach ($throwable->getViolations() as $violation) {

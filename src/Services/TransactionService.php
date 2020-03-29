@@ -6,7 +6,9 @@ namespace App\Services;
 
 use App\Entity\Transaction;
 use App\Entity\User;
-use App\Exceptions\TransactionException;
+use App\Rules\TransactionAccountSumRule;
+use App\Rules\TransactionAmountRule;
+use App\Services\BusinessValidation\BusinessValidationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -18,12 +20,19 @@ class TransactionService
     private $entityManager;
 
     /**
+     * @var BusinessValidationService
+     */
+    private $businessValidationService;
+
+    /**
      * TransactionService constructor.
      * @param EntityManagerInterface $entityManager
+     * @param BusinessValidationService $businessValidationService
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, BusinessValidationService $businessValidationService)
     {
         $this->entityManager = $entityManager;
+        $this->businessValidationService = $businessValidationService;
     }
 
     public function create(User $fromUser, User $toUser, int $amount) : Transaction
@@ -33,13 +42,10 @@ class TransactionService
             $accountFrom = $fromUser->getAccount();
             $accountTo = $toUser->getAccount();
 
-            if ($amount < 0) {
-                throw new TransactionException('Нельзя использовать отрицательное количество', 400);
-            }
-
-            if ($accountFrom->getSum() < $amount) {
-                throw new TransactionException('Для совершения транзакции недостаточно средств', 400);
-            }
+            $this->businessValidationService->validate([
+                new TransactionAmountRule($amount),
+                new TransactionAccountSumRule($accountFrom, $amount),
+            ]);
 
             $accountFrom->setSum($accountFrom->getSum() - $amount);
             $accountTo->setSum($accountTo->getSum() + $amount);

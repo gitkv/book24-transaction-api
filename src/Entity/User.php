@@ -3,12 +3,13 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\Table(name="users")
  */
-class User
+class User implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -62,15 +63,24 @@ class User
         return $this;
     }
 
-    public function getAccount(): ?UserAccount
+    public function getAccount() : ?UserAccount
     {
         return $this->account;
     }
 
-    public function setAccount(UserAccount $account): self
+    public function setAccount(UserAccount $account) : self
     {
         $this->account = $account;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id'    => $this->getId(),
+            'name'  => $this->getName(),
+            'email' => $this->getEmail(),
+        ];
     }
 }

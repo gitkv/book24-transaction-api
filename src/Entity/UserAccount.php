@@ -5,12 +5,13 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserAccountRepository")
  * @ORM\Table(name="user_accounts")
  */
-class UserAccount
+class UserAccount implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -82,12 +83,12 @@ class UserAccount
     /**
      * @return Collection|Transaction[]
      */
-    public function getDebitTransactions(): Collection
+    public function getDebitTransactions() : Collection
     {
         return $this->debitTransactions;
     }
 
-    public function addDebitTransaction(Transaction $debitTransaction): self
+    public function addDebitTransaction(Transaction $debitTransaction) : self
     {
         if (!$this->debitTransactions->contains($debitTransaction)) {
             $this->debitTransactions[] = $debitTransaction;
@@ -97,7 +98,7 @@ class UserAccount
         return $this;
     }
 
-    public function removeDebitTransaction(Transaction $debitTransaction): self
+    public function removeDebitTransaction(Transaction $debitTransaction) : self
     {
         if ($this->debitTransactions->contains($debitTransaction)) {
             $this->debitTransactions->removeElement($debitTransaction);
@@ -113,12 +114,12 @@ class UserAccount
     /**
      * @return Collection|Transaction[]
      */
-    public function getCreditTransactions(): Collection
+    public function getCreditTransactions() : Collection
     {
         return $this->creditTransactions;
     }
 
-    public function addCreditTransaction(Transaction $creditTransaction): self
+    public function addCreditTransaction(Transaction $creditTransaction) : self
     {
         if (!$this->creditTransactions->contains($creditTransaction)) {
             $this->creditTransactions[] = $creditTransaction;
@@ -128,7 +129,7 @@ class UserAccount
         return $this;
     }
 
-    public function removeCreditTransaction(Transaction $creditTransaction): self
+    public function removeCreditTransaction(Transaction $creditTransaction) : self
     {
         if ($this->creditTransactions->contains($creditTransaction)) {
             $this->creditTransactions->removeElement($creditTransaction);
@@ -139,5 +140,14 @@ class UserAccount
         }
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id'    => $this->getId(),
+            'sum'   => $this->getSum(),
+            'owner' => $this->getOwner(),
+        ];
     }
 }

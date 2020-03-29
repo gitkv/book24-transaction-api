@@ -2,13 +2,16 @@
 
 namespace App\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TransactionRepository")
  * @ORM\Table(name="transactions")
  */
-class Transaction
+class Transaction implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -18,7 +21,7 @@ class Transaction
     private $id;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="datetime_immutable")
      */
     private $date;
 
@@ -44,12 +47,12 @@ class Transaction
         return $this->id;
     }
 
-    public function getDate() : ?\DateTimeInterface
+    public function getDate() : ?DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date) : self
+    public function setDate(DateTimeInterface $date) : self
     {
         $this->date = $date;
 
@@ -68,27 +71,38 @@ class Transaction
         return $this;
     }
 
-    public function getDebitAccount(): ?UserAccount
+    public function getDebitAccount() : ?UserAccount
     {
         return $this->debitAccount;
     }
 
-    public function setDebitAccount(?UserAccount $debitAccount): self
+    public function setDebitAccount(?UserAccount $debitAccount) : self
     {
         $this->debitAccount = $debitAccount;
 
         return $this;
     }
 
-    public function getCreditAccount(): ?UserAccount
+    public function getCreditAccount() : ?UserAccount
     {
         return $this->creditAccount;
     }
 
-    public function setCreditAccount(?UserAccount $creditAccount): self
+    public function setCreditAccount(?UserAccount $creditAccount) : self
     {
         $this->creditAccount = $creditAccount;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id'             => $this->id,
+            'debit_account'  => $this->debitAccount,
+            'credit_account' => $this->creditAccount,
+            'date'           => $this->date->format(DateTime::ATOM),
+            'amount'         => $this->amount,
+        ];
     }
 }

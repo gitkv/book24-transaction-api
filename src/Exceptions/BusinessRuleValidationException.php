@@ -6,7 +6,7 @@ use RuntimeException;
 
 class BusinessRuleValidationException extends RuntimeException
 {
-    protected $errors;
+    protected array $errors;
 
     public function __construct(array $errors)
     {

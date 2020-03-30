@@ -16,23 +16,23 @@ class User implements JsonSerializable
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private string $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $email;
+    private string $email;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\UserAccount", inversedBy="owner", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
-    private $account;
+    private UserAccount $account;
 
     public function getId() : ?int
     {

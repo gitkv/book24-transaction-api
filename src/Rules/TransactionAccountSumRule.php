@@ -16,12 +16,12 @@ final class TransactionAccountSumRule extends BusinessRule
     /**
      * @var UserAccount
      */
-    protected $account;
+    protected UserAccount $account;
 
     /**
      * @var int
      */
-    protected $amount;
+    protected int $amount;
 
     /**
      * TransactionAccountSumRule constructor.

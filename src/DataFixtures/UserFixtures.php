@@ -9,7 +9,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class UserFixtures extends Fixture
 {
-    private $userData = [
+    private array $userData = [
         [
             'name'       => 'user1',
             'email'      => 'user1@mail.demo',
@@ -37,6 +37,5 @@ class UserFixtures extends Fixture
             $manager->persist($user);
             $manager->flush();
         }
-
     }
 }

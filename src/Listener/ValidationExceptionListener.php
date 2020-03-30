@@ -40,9 +40,7 @@ class ValidationExceptionListener implements EventSubscriberInterface
         $errors = [];
         if ($throwable instanceof BusinessRuleValidationException) {
             $errors = $throwable->getErrors();
-        }
-        else {
-
+        } else {
             $errors[] = $throwable->getMessage();
         }
 
@@ -51,9 +49,11 @@ class ValidationExceptionListener implements EventSubscriberInterface
             $errors[$violation->getPropertyPath()] = $violation->getMessage();
         }*/
 
-        $response = new JsonResponse([
-            'errors' => $errors,
-        ], 400);
+        $response = new JsonResponse(
+            [
+                'errors' => $errors,
+            ], 400
+        );
 
         $event->setResponse($response);
         $event->stopPropagation();

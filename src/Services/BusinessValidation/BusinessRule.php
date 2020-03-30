@@ -6,7 +6,7 @@ namespace App\Services\BusinessValidation;
 abstract class BusinessRule
 {
 
-    public $when = true;
+    public bool $when = true;
 
     /**
      * Determine if the validation rule passes.

@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use JsonSerializable;
 
 /**
@@ -18,27 +19,27 @@ class UserAccount implements JsonSerializable
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $sum;
+    private int $sum;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\User", mappedBy="account", cascade={"persist", "remove"})
      */
-    private $owner;
+    private User $owner;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="debitAccount")
      */
-    private $debitTransactions;
+    private PersistentCollection $debitTransactions;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="creditAccount")
      */
-    private $creditTransactions;
+    private PersistentCollection $creditTransactions;
 
     public function __construct()
     {

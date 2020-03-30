@@ -21,20 +21,23 @@ class ModelResolver implements ArgumentValueResolverInterface
     /**
      * @var SerializerInterface
      */
-    private $serializer;
+    private SerializerInterface $serializer;
 
     /**
      * @var ValidatorInterface
      */
-    private $validator;
+    private ValidatorInterface $validator;
 
     /**
      * @var string
      */
-    private $namespace;
+    private string $namespace;
 
-    public function __construct(SerializerInterface $serializer, ValidatorInterface $validator, $namespace = 'App\\Dto\\')
-    {
+    public function __construct(
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+        $namespace = 'App\\Dto\\'
+    ) {
         $this->serializer = $serializer;
         $this->validator = $validator;
         $this->namespace = $namespace;
@@ -45,7 +48,11 @@ class ModelResolver implements ArgumentValueResolverInterface
      */
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
-        $model = $this->serializer->deserialize($request->getContent(), $argument->getType(), $request->getContentType());
+        $model = $this->serializer->deserialize(
+            $request->getContent(),
+            $argument->getType(),
+            $request->getContentType()
+        );
 
         $violations = $this->validator->validate($model);
         if ($violations->count() > 0) {

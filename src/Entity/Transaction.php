@@ -18,29 +18,29 @@ class Transaction implements JsonSerializable
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="datetime_immutable")
      */
-    private $date;
+    private DateTimeInterface $date;
 
     /**
      * @ORM\Column(type="bigint")
      */
-    private $amount;
+    private int $amount;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\UserAccount", inversedBy="debitTransactions")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $debitAccount;
+    private UserAccount $debitAccount;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\UserAccount", inversedBy="creditTransactions")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $creditAccount;
+    private UserAccount $creditAccount;
 
     public function getId() : ?int
     {

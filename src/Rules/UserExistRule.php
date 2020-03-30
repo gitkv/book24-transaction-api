@@ -18,7 +18,7 @@ final class UserExistRule extends BusinessRule
     /**
      * @var string
      */
-    protected $email;
+    protected string $email;
 
     /**
      * UserExistRule constructor.

@@ -15,7 +15,7 @@ final class TransactionAmountRule extends BusinessRule
     /**
      * @var int
      */
-    protected $amount;
+    protected int $amount;
 
     /**
      * TransactionAmountRule constructor.

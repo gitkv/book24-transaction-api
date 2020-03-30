@@ -17,17 +17,17 @@ class TransactionController extends AbstractController
     /**
      * @var TransactionService
      */
-    private $service;
+    private TransactionService $service;
 
     /**
      * @var EntityManagerInterface
      */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     /**
      * @var BusinessValidationService
      */
-    private $businessValidationService;
+    private BusinessValidationService $businessValidationService;
 
     /**
      * TransactionController constructor.
@@ -39,8 +39,7 @@ class TransactionController extends AbstractController
         TransactionService $service,
         EntityManagerInterface $entityManager,
         BusinessValidationService $businessValidationService
-    )
-    {
+    ) {
         $this->service = $service;
         $this->entityManager = $entityManager;
         $this->businessValidationService = $businessValidationService;
@@ -58,10 +57,12 @@ class TransactionController extends AbstractController
         $fromUser = $userRepository->findOneBy(['email' => $createTransactionDto->getFromUser()]);
         $toUser = $userRepository->findOneBy(['email' => $createTransactionDto->getToUser()]);
 
-        $this->businessValidationService->validate([
-            new UserExistRule($fromUser, $createTransactionDto->getFromUser()),
-            new UserExistRule($toUser, $createTransactionDto->getToUser()),
-        ]);
+        $this->businessValidationService->validate(
+            [
+                new UserExistRule($fromUser, $createTransactionDto->getFromUser()),
+                new UserExistRule($toUser, $createTransactionDto->getToUser()),
+            ]
+        );
 
         $transaction = $this->service->create($fromUser, $toUser, $createTransactionDto->getAmount());
 

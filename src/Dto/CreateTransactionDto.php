@@ -13,20 +13,20 @@ final class CreateTransactionDto
      * @Assert\NotBlank()
      * @Assert\Email()
      */
-    private $from_user;
+    private string $from_user;
     /**
      * @var string
      * @Assert\NotBlank()
      * @Assert\Email()
      */
-    private $to_user;
+    private string $to_user;
 
     /**
-     * @var integer
+     * @var int
      * @Assert\Type("integer")
      * @Assert\Expression("this.getAmount() > 0")
      */
-    private $amount;
+    private int $amount;
 
     /**
      * @return string

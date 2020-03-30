@@ -17,52 +17,55 @@ class TransactionService
     /**
      * @var EntityManagerInterface
      */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     /**
      * @var BusinessValidationService
      */
-    private $businessValidationService;
+    private BusinessValidationService $businessValidationService;
 
     /**
      * TransactionService constructor.
      * @param EntityManagerInterface $entityManager
      * @param BusinessValidationService $businessValidationService
      */
-    public function __construct(EntityManagerInterface $entityManager, BusinessValidationService $businessValidationService)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        BusinessValidationService $businessValidationService
+    ) {
         $this->entityManager = $entityManager;
         $this->businessValidationService = $businessValidationService;
     }
 
     public function create(User $fromUser, User $toUser, int $amount) : Transaction
     {
-        $transaction = $this->entityManager->transactional(function ($em) use ($fromUser, $toUser, $amount) {
+        return $this->entityManager->transactional(
+            function ($em) use ($fromUser, $toUser, $amount) {
+                $accountFrom = $fromUser->getAccount();
+                $accountTo = $toUser->getAccount();
 
-            $accountFrom = $fromUser->getAccount();
-            $accountTo = $toUser->getAccount();
+                $this->businessValidationService->validate(
+                    [
+                        new TransactionAmountRule($amount),
+                        new TransactionAccountSumRule($accountFrom, $amount),
+                    ]
+                );
 
-            $this->businessValidationService->validate([
-                new TransactionAmountRule($amount),
-                new TransactionAccountSumRule($accountFrom, $amount),
-            ]);
+                $accountFrom->setSum($accountFrom->getSum() - $amount);
+                $accountTo->setSum($accountTo->getSum() + $amount);
 
-            $accountFrom->setSum($accountFrom->getSum() - $amount);
-            $accountTo->setSum($accountTo->getSum() + $amount);
+                $transaction = (new Transaction())
+                    ->setAmount($amount)
+                    ->setCreditAccount($accountTo)
+                    ->setDate(new DateTimeImmutable("now"));
 
-            $transaction = (new Transaction())
-                ->setAmount($amount)
-                ->setCreditAccount($accountTo)
-                ->setDate(new DateTimeImmutable("now"));
+                $accountFrom->addDebitTransaction($transaction);
 
-            $accountFrom->addDebitTransaction($transaction);
+                $em->persist($transaction);
+                $em->flush();
 
-            $em->persist($transaction);
-            $em->flush();
-
-            return $transaction;
-        });
-
-        return $transaction;
+                return $transaction;
+            }
+        );
     }
 }
